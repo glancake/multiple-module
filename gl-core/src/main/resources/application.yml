@@ -1,0 +1,13 @@
+server:
+  port: 8989
+
+spring:
+  application:
+    name: gl-core
+  profiles:
+    active: dev
+
+# Enable SQL logging
+logging:
+  level:
+    com.gl.mapper: debug
