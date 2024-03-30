@@ -8,7 +8,10 @@ import com.gl.dto.GlAccountRegisterReq;
 import com.gl.dto.GlAccountSignInReq;
 import com.gl.service.GlAccountService;
 import com.gl.mapper.GlAccountMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -19,6 +22,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class GlAccountServiceImpl extends ServiceImpl<GlAccountMapper, GlAccount>
         implements GlAccountService {
+
+
 
     @Override
     public void register(GlAccountRegisterReq registerReq) {
