@@ -29,9 +29,16 @@ public class GlAccountServiceImpl extends ServiceImpl<GlAccountMapper, GlAccount
     @Override
     public void login(GlAccountSignInReq signInReq) {
         QueryWrapper<GlAccount> queryWrapper = new QueryWrapper<GlAccount>()
-                .eq("account",signInReq.getAccount())
-                .eq("password",signInReq.getPassword());
+                .eq("account", signInReq.getAccount())
+                .eq("password", signInReq.getPassword());
         baseMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public GlAccount findAccountByUname(String uname) {
+        QueryWrapper<GlAccount> queryWrapper = new QueryWrapper<GlAccount>()
+                .eq("account", uname);
+        return baseMapper.selectOne(queryWrapper);
     }
 
     private GlAccount convertGlAccountRegisterReq(GlAccountRegisterReq registerReq) {
@@ -41,7 +48,7 @@ public class GlAccountServiceImpl extends ServiceImpl<GlAccountMapper, GlAccount
         return glAccount;
     }
 
-    private GlAccount convertGlAccountSignInReq( GlAccountSignInReq signInReq) {
+    private GlAccount convertGlAccountSignInReq(GlAccountSignInReq signInReq) {
         GlAccount glAccount = new GlAccount();
         glAccount.setAccount(signInReq.getAccount());
         glAccount.setPassword(signInReq.getPassword());

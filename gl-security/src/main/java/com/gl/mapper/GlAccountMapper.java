@@ -1,7 +1,7 @@
 package com.gl.mapper;
 
-import com.gl.domain.GlAccount;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.gl.domain.GlAccount;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

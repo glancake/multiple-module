@@ -18,4 +18,6 @@ public interface GlAccountService extends IService<GlAccount> {
  */
     void register(GlAccountRegisterReq registerReq);
     void login(GlAccountSignInReq signInReq);
+
+    GlAccount findAccountByUname(String uname);
 }
