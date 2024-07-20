@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 */
 @Service
 public class GlMesServiceImpl extends ServiceImpl<GlMesMapper, GlMes>
-    implements GlMesService{
+    implements GlMesService  {
 
     @Override
     public void addMes(GlMesReq mesReq) {

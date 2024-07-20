@@ -18,6 +18,6 @@ public interface GlMesService extends IService<GlMes> {
      * 4.查询
      */
 
-    void addMes(GlMesReq mesReq);
+    void addMes(GlMesReq mesReq) throws Exception;
     void modifyMes(GlMesReq mesReq,Integer id);
 }
