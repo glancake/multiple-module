@@ -2,11 +2,19 @@ package com.gl.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gl.domain.GlAccount;
 import com.gl.domain.GlMes;
 import com.gl.dto.GlMesReq;
 import com.gl.service.GlMesService;
 import com.gl.mapper.GlMesMapper;
+import com.gl.service.UserService;
+import com.gl.util.UserProvider;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+
+import java.util.Collection;
 
 /**
 * @author Administrator
@@ -20,6 +28,8 @@ public class GlMesServiceImpl extends ServiceImpl<GlMesMapper, GlMes>
     @Override
     public void addMes(GlMesReq mesReq) {
         GlMes glMes = convertGlMesReq(mesReq);
+        GlAccount user = UserProvider.getUser();
+        glMes.setAccountId(user.getId());
         baseMapper.insert(glMes);
     }
 

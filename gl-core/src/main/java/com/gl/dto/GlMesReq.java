@@ -1,14 +1,14 @@
 package com.gl.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import org.springframework.lang.NonNull;
 
 @Data
 public class GlMesReq {
 
-    @NonNull
+    @NotNull
     private String content;
 
-    @NonNull
+    @NotNull
     private Integer accountId;
 }
