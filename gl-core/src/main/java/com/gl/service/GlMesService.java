@@ -3,6 +3,7 @@ package com.gl.service;
 import com.gl.domain.GlMes;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gl.dto.GlMesReq;
+import com.gl.exception.BizException;
 
 /**
 * @author Administrator
@@ -19,5 +20,5 @@ public interface GlMesService extends IService<GlMes> {
      */
 
     void addMes(GlMesReq mesReq) throws Exception;
-    void modifyMes(GlMesReq mesReq,Integer id);
+    void modifyMes(GlMesReq mesReq,Integer id) throws BizException;
 }

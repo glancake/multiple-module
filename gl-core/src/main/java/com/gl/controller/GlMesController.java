@@ -1,23 +1,20 @@
 package com.gl.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import com.gl.api.CommonResult;
 import com.gl.api.Log;
 import com.gl.domain.GlMes;
 import com.gl.dto.GlMesReq;
 import com.gl.entity.Pagination;
+import com.gl.exception.BizException;
 import com.gl.service.GlMesService;
-import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/auth/")
@@ -68,15 +65,9 @@ public class GlMesController {
     @Log("修改消息---/api/v1/auth/mes/{id}")
     @PatchMapping("mes/{id}")
     public CommonResult modifyMes(@RequestBody @Validated GlMesReq glMesReq,
-                                  @PathVariable Integer id) {
-        try {
+                                  @PathVariable Integer id) throws BizException {
             glMesService.modifyMes(glMesReq, id);
             return CommonResult.success(Collections.singletonMap("message", "Message modified successfully!"));
-        } catch (ConstraintViolationException e) {
-            return CommonResult.failed(e.getMessage());
-        } catch (Exception e) {
-            return CommonResult.failed("Internal server error");
-        }
     }
 
 }

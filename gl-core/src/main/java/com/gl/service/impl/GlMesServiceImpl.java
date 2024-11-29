@@ -5,10 +5,12 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gl.domain.GlAccount;
 import com.gl.domain.GlMes;
 import com.gl.dto.GlMesReq;
+import com.gl.exception.BizException;
 import com.gl.service.GlMesService;
 import com.gl.mapper.GlMesMapper;
 import com.gl.service.UserService;
 import com.gl.util.UserProvider;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -23,10 +25,10 @@ import java.util.Collection;
 */
 @Service
 public class GlMesServiceImpl extends ServiceImpl<GlMesMapper, GlMes>
-    implements GlMesService  {
+    implements GlMesService {
 
     @Override
-    public void addMes(GlMesReq mesReq) {
+    public void addMes(GlMesReq mesReq) throws BizException {
         GlMes glMes = convertGlMesReq(mesReq);
         GlAccount user = UserProvider.getUser();
         glMes.setAccountId(user.getId());
@@ -34,18 +36,18 @@ public class GlMesServiceImpl extends ServiceImpl<GlMesMapper, GlMes>
     }
 
     @Override
-    public void modifyMes(GlMesReq mesReq,Integer id) {
+    public void modifyMes(GlMesReq mesReq,Integer id) throws BizException {
         GlMes glMes = convertGlMesReq(mesReq);
         glMes.setId(id);
-        UpdateWrapper<GlMes> glMesUpdateWrapper = new UpdateWrapper<>();
-        glMesUpdateWrapper.set("content", glMes.getContent());
-        baseMapper.update(glMesUpdateWrapper);
+        baseMapper.updateById(glMes);
     }
 
-    private GlMes convertGlMesReq(GlMesReq mesReq){
+    private GlMes convertGlMesReq(GlMesReq mesReq) throws BizException {
         GlMes glMes = new GlMes();
+        if (StringUtils.isBlank(mesReq.getContent()) ){
+            throw new BizException("内容不能为空");
+        }
         glMes.setContent(mesReq.getContent());
-        glMes.setAccountId(mesReq.getAccountId());
         return glMes;
     }
 }

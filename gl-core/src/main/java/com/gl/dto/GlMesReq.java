@@ -6,9 +6,7 @@ import lombok.Data;
 @Data
 public class GlMesReq {
 
-    @NotNull
+//    @NotNull
     private String content;
 
-    @NotNull
-    private Integer accountId;
 }

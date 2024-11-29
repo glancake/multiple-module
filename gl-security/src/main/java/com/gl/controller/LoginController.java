@@ -32,7 +32,6 @@ public class LoginController {
         String username = signInReq.getAccount();
         String password = signInReq.getPassword();
 
-        try {
             // 传递用户密码给到SpringSecurity执行校验，如果校验失败，会进入BadCredentialsException
             Authentication authentication =
                     authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
@@ -44,9 +43,6 @@ public class LoginController {
             String token = jwtService.generateToken(userDetails);
 
             return CommonResult.success(token);
-        } catch (Exception e) {
-            return CommonResult.failed(e.getMessage());
-        }
     }
 
     @PostMapping("register")

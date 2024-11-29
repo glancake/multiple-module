@@ -1,6 +1,5 @@
 package com.gl.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gl.domain.GlAccount;
@@ -8,10 +7,6 @@ import com.gl.dto.GlAccountRegisterReq;
 import com.gl.dto.GlAccountSignInReq;
 import com.gl.service.GlAccountService;
 import com.gl.mapper.GlAccountMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.NonNull;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
