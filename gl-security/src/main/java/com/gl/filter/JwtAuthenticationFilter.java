@@ -22,6 +22,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -62,5 +64,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    private void handleExpiredJwt(HttpServletRequest request, HttpServletResponse response, String jwt) throws IOException {
+        final String refreshHeader = request.getHeader("X-Refresh-Token");
+
+        if (refreshHeader != null && StringUtils.startsWith(refreshHeader, "Bearer ")) {
+            String refreshToken = refreshHeader.substring(7);
+            try {
+                String userEmail = jwtService.extractUserNameFromRefreshToken(refreshToken);
+                UserDetails userDetails = userService.userDetailsService().loadUserByUsername(userEmail);
+                if (jwtService.isRefreshTokenValid(refreshToken, userDetails)) {
+                    String newJwt = jwtService.generateToken(userDetails);
+                    Map<String, Object> tokens = new HashMap<>();
+                    tokens.put("access_token", newJwt);
+                    tokens.put("refresh_token", refreshToken); // Optionally, you can rotate the refresh token here
+
+                    response.setContentType("application/json");
+                    PrintWriter out = response.getWriter();
+                    out.print(tokens);
+                    out.flush();
+                } else {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid refresh token");
+                }
+            } catch (Exception e) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid refresh token");
+            }
+        } else {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT expired");
+        }
     }
 }

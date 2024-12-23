@@ -7,7 +7,12 @@ import com.gl.dto.GlAccountRegisterReq;
 import com.gl.dto.GlAccountSignInReq;
 import com.gl.service.GlAccountService;
 import com.gl.mapper.GlAccountMapper;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Administrator
@@ -17,7 +22,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class GlAccountServiceImpl extends ServiceImpl<GlAccountMapper, GlAccount>
         implements GlAccountService {
-
 
 
     @Override
@@ -38,7 +42,13 @@ public class GlAccountServiceImpl extends ServiceImpl<GlAccountMapper, GlAccount
     public GlAccount findAccountByUname(String uname) {
         QueryWrapper<GlAccount> queryWrapper = new QueryWrapper<GlAccount>()
                 .eq("account", uname);
-        return baseMapper.selectOne(queryWrapper);
+        GlAccount glAccount = baseMapper.selectOne(queryWrapper);
+//        临时设置权限
+        List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
+        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority("ROLE_USER");
+        grantedAuthorities.add(grantedAuthority);
+        glAccount.setAuthorities(grantedAuthorities);
+        return glAccount;
     }
 
     private GlAccount convertGlAccountRegisterReq(GlAccountRegisterReq registerReq) {

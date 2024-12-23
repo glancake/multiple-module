@@ -15,7 +15,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class SwaggerConfig implements WebMvcConfigurer {
 
-    @Value("${spring.application.name:我的应用}")
+    @Value("${spring.application.name}")
     private String applicationName;
 
     @Bean

@@ -17,6 +17,7 @@ public interface JwtService {
      * @return
      */
     String generateToken(UserDetails userDetails);
+    String generateRefreshToken(UserDetails userDetails);
 
     /**
      * token合法性校验
@@ -25,4 +26,7 @@ public interface JwtService {
      * @return
      */
     boolean isTokenValid(String token, UserDetails userDetails);
+
+    String extractUserNameFromRefreshToken(String refreshToken);
+    Boolean isRefreshTokenValid(String refreshToken, UserDetails userDetails);
 }

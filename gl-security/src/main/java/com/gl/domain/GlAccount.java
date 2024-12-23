@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * 
@@ -33,7 +34,8 @@ public class GlAccount implements Serializable, UserDetails {
      * 
      */
     private String password;
-
+    @TableField(exist = false)
+    private List<GrantedAuthority> authorities;
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 
@@ -80,7 +82,7 @@ public class GlAccount implements Serializable, UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return authorities;
     }
 
     @Override
