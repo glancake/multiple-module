@@ -31,6 +31,6 @@ public interface GlMesService extends IService<GlMes> {
      * @param id 要修改的GlMes对象的标识符
      * @throws BizException 如果修改过程中发生业务逻辑相关的错误，则抛出异常
      */
-    void modifyMes(GlMesReq mesReq,Integer id) throws BizException;
+    void modifyMes(GlMesReq mesReq,Long id) throws BizException;
 }
 

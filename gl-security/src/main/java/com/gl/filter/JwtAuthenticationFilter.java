@@ -3,7 +3,6 @@ package com.gl.filter;
 import com.gl.service.GlAccountService;
 import com.gl.service.JwtService;
 
-import com.gl.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -15,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 
@@ -30,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private JwtService jwtService;
     @Autowired
-    private UserService userService;
+    private GlAccountService glAccountService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -52,8 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (StringUtils.isNotEmpty(userEmail)
                 && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userService.userDetailsService()
-                    .loadUserByUsername(userEmail);
+            UserDetails userDetails = glAccountService.loadUserByUsername(userEmail);
             if (jwtService.isTokenValid(jwt, userDetails)) {
                 SecurityContext context = SecurityContextHolder.createEmptyContext();
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
@@ -73,7 +72,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String refreshToken = refreshHeader.substring(7);
             try {
                 String userEmail = jwtService.extractUserNameFromRefreshToken(refreshToken);
-                UserDetails userDetails = userService.userDetailsService().loadUserByUsername(userEmail);
+                UserDetails userDetails = glAccountService.loadUserByUsername(userEmail);
                 if (jwtService.isRefreshTokenValid(refreshToken, userDetails)) {
                     String newJwt = jwtService.generateToken(userDetails);
                     Map<String, Object> tokens = new HashMap<>();

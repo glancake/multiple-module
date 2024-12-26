@@ -4,6 +4,8 @@ import com.gl.domain.GlAccount;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gl.dto.GlAccountRegisterReq;
 import com.gl.dto.GlAccountSignInReq;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
 * @author Administrator
@@ -19,5 +21,11 @@ public interface GlAccountService extends IService<GlAccount> {
     void register(GlAccountRegisterReq registerReq);
     void login(GlAccountSignInReq signInReq);
 
-    GlAccount findAccountByUname(String uname);
+    /**
+     * 校验验证码
+     * @param captcha
+     * @return
+     */
+    boolean isCaptchaValid(String captcha);
+    UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
 }

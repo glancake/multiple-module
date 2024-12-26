@@ -18,8 +18,8 @@ token:
 jwt:
   access:
     expiration:
-#      ms: 3600000 # 1 hour
-      ms: 60000
+      ms: 3600000 # 1 hour
+#      ms: 60000
   refresh:
     expiration:
       ms: 604800000 # 1 week

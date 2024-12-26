@@ -37,7 +37,7 @@ public class GlMesController {
 
     @Log("获取所有消息---/api/v1/auth/mes")
     @Operation(summary = "获取所有消息")
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_DEVELOPER')")
     @GetMapping("mes")
     public CommonResult<IPage<MessageDTO>> getMesList(Pagination pagination) {
         // Directly use the provided or default values for pagination
@@ -60,7 +60,7 @@ public class GlMesController {
 
     @Log("添加消息---/api/v1/auth/mes")
     @Operation(summary = "添加消息")
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("mes")
     public CommonResult<Object> addMes(@RequestBody @Validated GlMesReq glMesReq) throws Exception {
         glMesService.addMes(glMesReq);
@@ -86,7 +86,7 @@ public class GlMesController {
     @Operation(summary = "修改消息")
     @PatchMapping("mes/{id}")
     public CommonResult modifyMes(@RequestBody @Validated GlMesReq glMesReq,
-                                  @PathVariable Integer id) throws BizException {
+                                  @PathVariable Long id) throws BizException {
         glMesService.modifyMes(glMesReq, id);
         return CommonResult.success(Collections.singletonMap("message", "Message modified successfully!"));
     }

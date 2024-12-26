@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import com.gl.api.Log;
 import lombok.Data;
 
 /**
@@ -18,7 +20,7 @@ public class GlMes implements Serializable {
      */
     @TableId(type =IdType.ASSIGN_ID)
 
-    private Integer id;
+    private Long id;
 
     /**
      * 
@@ -33,7 +35,7 @@ public class GlMes implements Serializable {
     /**
      * 
      */
-    private Integer accountId;
+    private Long accountId;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
