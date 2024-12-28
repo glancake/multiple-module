@@ -8,4 +8,5 @@ public interface UserRoleService {
 
     List<Role> getRolesByUserId(Long userId);
 
+    boolean setUserRole(Long id, String roleName);
 }

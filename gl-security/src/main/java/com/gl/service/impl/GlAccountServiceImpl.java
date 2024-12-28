@@ -37,6 +37,10 @@ public class GlAccountServiceImpl extends ServiceImpl<GlAccountMapper, GlAccount
     public void register(GlAccountRegisterReq registerReq) {
         GlAccount glAccount = convertGlAccountRegisterReq(registerReq);
         baseMapper.insert(glAccount);
+//        添加view权限
+        boolean flag = userRoleService.setUserRole(glAccount.getId(), "ROLE_VIEWER");
+
+
     }
 
     @Override

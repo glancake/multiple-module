@@ -60,7 +60,7 @@ public class GlMesController {
 
     @Log("添加消息---/api/v1/auth/mes")
     @Operation(summary = "添加消息")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_DEVELOPER')")
     @PostMapping("mes")
     public CommonResult<Object> addMes(@RequestBody @Validated GlMesReq glMesReq) throws Exception {
         glMesService.addMes(glMesReq);

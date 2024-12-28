@@ -10,7 +10,7 @@ import lombok.Data;
 @Data
 public class UserRole {
 
-    @TableId(type = IdType.ASSIGN_UUID)
+    @TableId(type = IdType.ASSIGN_ID)
     private Long id;
 
     @TableField("user_id")

@@ -42,6 +42,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public CommonResult<String> handleException(Exception ex) {
         // 处理其他未捕获的异常
+        ex.printStackTrace();
         log.error("Exception: {}", ex.getMessage());
         return CommonResult.failed("系统异常");
     }

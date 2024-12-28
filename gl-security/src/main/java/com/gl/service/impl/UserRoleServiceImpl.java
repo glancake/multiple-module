@@ -17,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole> implements UserRoleService {
     private final RoleMapper roleMapper;
+    private final UserRoleMapper userRoleMapper;
 
     @Override
     public List<Role> getRolesByUserId(Long userId) {
@@ -25,5 +26,14 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole> i
             return roleMapper.selectBatchIds(list.stream().map(UserRole::getRoleId).toList());
         }
         return List.of();
+    }
+
+    @Override
+    public boolean setUserRole(Long id, String roleName) {
+        Role role = roleMapper.selectOne(new LambdaQueryWrapper<Role>().eq(Role::getName, roleName));
+        UserRole userRole = new UserRole();
+        userRole.setRoleId(role.getId());
+        userRole.setUserId(id);
+        return save(userRole);
     }
 }
