@@ -21,4 +21,7 @@ public class GlAccountSignInReq {
 
     @NotBlank
     private String captcha;
+
+    @NotBlank(message = "clientId不能为空")
+    private String clientId;
 }

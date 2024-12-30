@@ -21,11 +21,6 @@ public interface GlAccountService extends IService<GlAccount> {
     void register(GlAccountRegisterReq registerReq);
     void login(GlAccountSignInReq signInReq);
 
-    /**
-     * 校验验证码
-     * @param captcha
-     * @return
-     */
-    boolean isCaptchaValid(String captcha);
+
     UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
 }

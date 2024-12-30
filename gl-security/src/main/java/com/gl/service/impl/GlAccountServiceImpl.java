@@ -8,6 +8,7 @@ import com.gl.dto.GlAccountSignInReq;
 import com.gl.service.GlAccountService;
 import com.gl.mapper.GlAccountMapper;
 import com.gl.service.UserRoleService;
+import com.gl.util.JedisPoolSingleton;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,6 +19,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import redis.clients.jedis.Jedis;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,9 +52,13 @@ public class GlAccountServiceImpl extends ServiceImpl<GlAccountMapper, GlAccount
         GlAccount glAccount = baseMapper.selectOne(queryWrapper);
 
         // 验证验证码
-        if (!isCaptchaValid(signInReq.getCaptcha())) {
+        if (!isCaptchaValid(signInReq.getCaptcha(),signInReq.getClientId())) {
             throw new BadCredentialsException("验证码错误!");
         }
+        // 销毁验证码
+        Jedis resource = JedisPoolSingleton.getInstance().getResource();
+        resource.del(signInReq.getClientId());
+
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
         // 验证密码
@@ -63,9 +69,13 @@ public class GlAccountServiceImpl extends ServiceImpl<GlAccountMapper, GlAccount
     }
 
 
-    @Override
-    public boolean isCaptchaValid(String captcha) {
-        return "000000".equals(captcha);
+    public boolean isCaptchaValid(String captcha, String clientId) {
+        Jedis resource = JedisPoolSingleton.getInstance().getResource();
+        String rawCaptcha = resource.get(clientId);
+        if (rawCaptcha == null){
+            throw new BadCredentialsException("验证码已过期!");
+        }
+        return rawCaptcha.equalsIgnoreCase(captcha);
     }
 
     private GlAccount convertGlAccountRegisterReq(GlAccountRegisterReq registerReq) {

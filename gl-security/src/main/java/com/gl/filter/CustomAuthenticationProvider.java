@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -20,16 +19,14 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         CustomAuthenticationToken customAuthenticationToken = (CustomAuthenticationToken) authentication;
-        String username = authentication.getName();
-        String password = authentication.getCredentials().toString();
-        String captcha = customAuthenticationToken.getCaptcha();
         GlAccountSignInReq glAccountSignInReq = new GlAccountSignInReq();
-        glAccountSignInReq.setAccount(username);
-        glAccountSignInReq.setPassword(password);
-        glAccountSignInReq.setCaptcha(captcha);
+        glAccountSignInReq.setAccount(authentication.getName());
+        glAccountSignInReq.setPassword(authentication.getCredentials().toString());
+        glAccountSignInReq.setCaptcha(customAuthenticationToken.getCaptcha());
+        glAccountSignInReq.setClientId(customAuthenticationToken.getClientId());
         glAccountService.login(glAccountSignInReq);
         GlAccount glAccount = new GlAccount();
-        glAccount.setAccount(username);
+        glAccount.setAccount(authentication.getName());
         return new CustomAuthenticationToken(glAccount,glAccountSignInReq);
     }
 

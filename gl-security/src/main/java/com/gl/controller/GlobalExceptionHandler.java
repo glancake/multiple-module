@@ -5,9 +5,14 @@ import com.gl.exception.BizException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.List;
 
 
 /**
@@ -37,6 +42,16 @@ public class GlobalExceptionHandler {
 
         return CommonResult.failed("权限不足!");
     }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseBody
+    public CommonResult<String> handleAccessDeniedException(MethodArgumentNotValidException ex) {
+        List<ObjectError> allErrors = ex.getBindingResult().getAllErrors();
+        FieldError fieldError =(FieldError) allErrors.get(0);
+        String firstErrorMessage = fieldError.getDefaultMessage();
+        return CommonResult.failed(firstErrorMessage);
+    }
+
 
     @ExceptionHandler(Exception.class)
     @ResponseBody
