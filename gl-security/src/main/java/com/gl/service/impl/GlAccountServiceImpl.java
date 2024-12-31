@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gl.domain.GlAccount;
 import com.gl.dto.GlAccountRegisterReq;
 import com.gl.dto.GlAccountSignInReq;
+import com.gl.exception.BizException;
 import com.gl.service.GlAccountService;
 import com.gl.mapper.GlAccountMapper;
 import com.gl.service.UserRoleService;
@@ -19,8 +20,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import redis.clients.jedis.Jedis;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,6 +42,8 @@ public class GlAccountServiceImpl extends ServiceImpl<GlAccountMapper, GlAccount
     @Override
     public void register(GlAccountRegisterReq registerReq) {
         GlAccount glAccount = convertGlAccountRegisterReq(registerReq);
+        //          生成一个随机的昵称
+        String nickname = "用户" + glAccount.getId();
         baseMapper.insert(glAccount);
 //        添加view权限
         boolean flag = userRoleService.setUserRole(glAccount.getId(), "ROLE_VIEWER");
@@ -104,6 +110,26 @@ public class GlAccountServiceImpl extends ServiceImpl<GlAccountMapper, GlAccount
                 .collect(Collectors.toList());
         glAccount.setAuthorities(grantedAuthorities);
         return glAccount;
+    }
+
+    @Override
+    public boolean updateAvatar(Long userId, MultipartFile avatar) throws BizException {
+        if (avatar != null) {
+            String fileName = avatar.getOriginalFilename();
+            assert fileName != null;
+            String fileType = fileName.substring(fileName.lastIndexOf("."));
+            String filePath = "avatar/" + userId + fileType;
+            try {
+                avatar.transferTo(new File(filePath));
+                GlAccount glAccount = new GlAccount();
+                glAccount.setId(userId);
+                glAccount.setAvatar(filePath);
+                baseMapper.updateById(glAccount);
+            } catch (IOException e) {
+                throw new BizException("update avatar failed");
+            }
+        }
+            return false;
     }
 }
 

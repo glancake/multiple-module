@@ -4,8 +4,10 @@ import com.gl.domain.GlAccount;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gl.dto.GlAccountRegisterReq;
 import com.gl.dto.GlAccountSignInReq;
+import com.gl.exception.BizException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
 * @author Administrator
@@ -23,4 +25,6 @@ public interface GlAccountService extends IService<GlAccount> {
 
 
     UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
+
+    boolean updateAvatar(Long userId, MultipartFile avatar) throws BizException;
 }

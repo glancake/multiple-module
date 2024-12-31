@@ -30,7 +30,12 @@
             <artifactId>jedis</artifactId>
             <version>3.7.0</version>
         </dependency>
-
+<!--        限流-->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>31.1-jre</version>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -26,14 +26,28 @@ public class GlAccount implements Serializable, UserDetails {
     private Long id;
 
     /**
-     * 
+     * 账号
      */
     private String account;
 
     /**
-     * 
+     * 密码
      */
     private String password;
+
+    /**
+     * 用户名
+     */
+    @TableField(value = "screen_name")
+    private String screenName;
+
+    /**
+     * 头像
+     */
+    @TableField(value = "avatar")
+    private String avatar;
+
+
     @TableField(exist = false)
     private List<GrantedAuthority> authorities;
     @TableField(exist = false)

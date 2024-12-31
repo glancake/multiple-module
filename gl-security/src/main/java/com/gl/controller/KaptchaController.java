@@ -2,12 +2,14 @@ package com.gl.controller;
 
 
 import cn.hutool.core.lang.UUID;
-import com.gl.service.RedisService;
-import com.gl.service.impl.RedisServiceImpl;
+import com.gl.exception.BizException;
 import com.gl.util.JedisPoolSingleton;
+import com.gl.util.RateLimitUtil;
 import com.google.code.kaptcha.Producer;
+import com.google.common.util.concurrent.RateLimiter;
 import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.filters.RateLimitFilter;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,7 +19,6 @@ import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.params.SetParams;
 
 import javax.imageio.ImageIO;
@@ -30,9 +31,15 @@ import java.io.IOException;
 public class KaptchaController {
 
     private final Producer producer;
+    private final RateLimiter getVerifyCode = RateLimitUtil.getRateLimiter( 1.0 / 5);
 
     @GetMapping("/getVerifyCode")
-    public void getVerifyCode(HttpServletResponse response, HttpSession session) throws IOException {
+    public void getVerifyCode(HttpServletResponse response, HttpSession session) throws IOException, BizException {
+
+        if (!getVerifyCode.tryAcquire()){
+            throw new BizException("请求过于频繁");
+        }
+
         // 生成唯一的 client_id
         String clientId = UUID.randomUUID().toString();
 
@@ -48,6 +55,7 @@ public class KaptchaController {
         response.setContentType("image/jpeg");
         // 获取随机验证码文本
         String text = producer.createText();
+        session.setAttribute("verifyCode", text);
         // 存储到redis
         Jedis resource = JedisPoolSingleton.getInstance().getResource();
         SetParams setParams = new SetParams();
