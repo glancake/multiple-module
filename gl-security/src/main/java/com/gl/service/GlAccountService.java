@@ -9,6 +9,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 /**
 * @author Administrator
 * @description 针对表【gl_account】的数据库操作Service
@@ -26,5 +28,7 @@ public interface GlAccountService extends IService<GlAccount> {
 
     UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
 
-    boolean updateAvatar(Long userId, MultipartFile avatar) throws BizException;
+    boolean updateAvatar(Long userId, MultipartFile avatar) throws  IOException;
+
+    GlAccount getUserInfo() throws IOException;
 }

@@ -5,11 +5,15 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gl.domain.GlAccount;
 import com.gl.dto.GlAccountRegisterReq;
 import com.gl.dto.GlAccountSignInReq;
-import com.gl.exception.BizException;
-import com.gl.service.GlAccountService;
+import com.gl.entity.FileType;
+import com.gl.entity.FileUploadPath;
+import com.gl.entity.FileUrl;
 import com.gl.mapper.GlAccountMapper;
+import com.gl.service.GlAccountService;
 import com.gl.service.UserRoleService;
+import com.gl.util.FileUtil;
 import com.gl.util.JedisPoolSingleton;
+import com.gl.util.UserProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import redis.clients.jedis.Jedis;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,6 +41,8 @@ import java.util.stream.Collectors;
 public class GlAccountServiceImpl extends ServiceImpl<GlAccountMapper, GlAccount>
         implements GlAccountService, UserDetailsService {
     private final UserRoleService userRoleService;
+    private final FileUploadPath fileUploadPath;
+    private final FileUrl fileUrl;
 
     @Override
     public void register(GlAccountRegisterReq registerReq) {
@@ -112,25 +117,35 @@ public class GlAccountServiceImpl extends ServiceImpl<GlAccountMapper, GlAccount
         return glAccount;
     }
 
-    @Override
-    public boolean updateAvatar(Long userId, MultipartFile avatar) throws BizException {
-        if (avatar != null) {
-            String fileName = avatar.getOriginalFilename();
-            assert fileName != null;
-            String fileType = fileName.substring(fileName.lastIndexOf("."));
-            String filePath = "avatar/" + userId + fileType;
-            try {
-                avatar.transferTo(new File(filePath));
-                GlAccount glAccount = new GlAccount();
-                glAccount.setId(userId);
-                glAccount.setAvatar(filePath);
-                baseMapper.updateById(glAccount);
-            } catch (IOException e) {
-                throw new BizException("update avatar failed");
-            }
-        }
-            return false;
+@Override
+public boolean updateAvatar(Long userId, MultipartFile avatar) throws IOException {
+    if (avatar == null) {
+        throw new IllegalArgumentException("Avatar file cannot be null");
     }
+
+    String newFileName = FileUtil.upload(avatar, fileUploadPath.getAvatarPath());
+    GlAccount glAccount = new GlAccount();
+    glAccount.setId(userId);
+    glAccount.setAvatar(newFileName);
+    boolean isUpdated = baseMapper.updateById(glAccount) > 0;
+    if (isUpdated) {
+        UserProvider.setUser(glAccount);
+    }
+    return isUpdated;
+}
+
+
+@Override
+public GlAccount getUserInfo() {
+    GlAccount user = UserProvider.getUser();
+    if (user == null) {
+        throw new IllegalStateException("User information not found");
+    }
+
+    user.setAvatar(String.format("%s/%s/%s", fileUrl.getUrl(), FileType.Avatar.getType(), user.getAvatar()));
+    return user;
+}
+
 }
 
 

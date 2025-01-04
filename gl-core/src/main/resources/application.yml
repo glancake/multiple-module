@@ -11,3 +11,6 @@ spring:
 logging:
   level:
     com.gl.mapper: debug
+
+project:
+  url: http://localhost:8989/api/v1/file

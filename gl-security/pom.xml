@@ -50,6 +50,10 @@
             <groupId>com.gl</groupId>
             <artifactId>gl-common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.gl</groupId>
+            <artifactId>gl-file</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
