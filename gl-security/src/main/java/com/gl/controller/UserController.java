@@ -38,5 +38,15 @@ public class UserController {
         return CommonResult.success(user);
     }
 
+    /**
+     * 更新个人信息
+     */
+    @PostMapping("/update_info")
+    @Operation(summary = "更新个人信息")
+    public CommonResult updateInfo(@RequestBody GlAccount glAccount) {
+        glAccountService.updateById(glAccount);
+        return CommonResult.success(null, "update info successfully");
+    }
+
 
 }

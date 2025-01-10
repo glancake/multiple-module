@@ -78,3 +78,37 @@ CREATE TABLE user_permissions
     permission_id BIGINT,
     PRIMARY KEY (user_id, permission_id)
 );
+
+CREATE TABLE organizations
+(
+    organization_id BIGINT PRIMARY KEY,
+    name            VARCHAR(255) NOT NULL,
+    description     TEXT,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    owner_user_id   BIGINT,
+    status          ENUM('active', 'inactive', 'pending') DEFAULT 'pending'
+);
+
+CREATE TABLE organization_members
+(
+    organization_member_id BIGINT PRIMARY KEY,
+    organization_id        BIGINT,
+    user_id                BIGINT,
+    role                   ENUM('owner', 'admin', 'member') DEFAULT 'member',
+    join_date              TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status                 ENUM('active', 'pending', 'blocked') DEFAULT 'active',
+    UNIQUE KEY unique_member (organization_id, user_id) -- 避免重复成员
+);
+
+CREATE TABLE organization_join_requests
+(
+    request_id           BIGINT PRIMARY KEY,
+    organization_id      BIGINT,
+    user_id              BIGINT,
+    request_type         ENUM('join', 'leave') NOT NULL,
+    request_date         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status               ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    processed_by_user_id BIGINT,
+    processed_date       TIMESTAMP
+);

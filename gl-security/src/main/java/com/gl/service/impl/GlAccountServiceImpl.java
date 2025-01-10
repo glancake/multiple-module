@@ -8,6 +8,8 @@ import com.gl.dto.GlAccountSignInReq;
 import com.gl.entity.FileType;
 import com.gl.entity.FileUploadPath;
 import com.gl.entity.FileUrl;
+import com.gl.exception.AccountAlreadyExistsException;
+import com.gl.exception.BizException;
 import com.gl.mapper.GlAccountMapper;
 import com.gl.service.GlAccountService;
 import com.gl.service.UserRoleService;
@@ -24,6 +26,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 import redis.clients.jedis.Jedis;
 
@@ -45,10 +48,18 @@ public class GlAccountServiceImpl extends ServiceImpl<GlAccountMapper, GlAccount
     private final FileUrl fileUrl;
 
     @Override
-    public void register(GlAccountRegisterReq registerReq) {
+    public void register(GlAccountRegisterReq registerReq) throws AccountAlreadyExistsException {
+        QueryWrapper<GlAccount> queryWrapper = new QueryWrapper<GlAccount>()
+                .eq("account", registerReq.getAccount());
+        GlAccount userByAccount = baseMapper.selectOne(queryWrapper);
+        if (userByAccount != null) {
+//            throw new Exist("该账号已被使用");
+            throw new AccountAlreadyExistsException("该账号已被使用" + registerReq.getAccount());
+        }
         GlAccount glAccount = convertGlAccountRegisterReq(registerReq);
         //          生成一个随机的昵称
         String nickname = "用户" + glAccount.getId();
+        glAccount.setScreenName(nickname);
         baseMapper.insert(glAccount);
 //        添加view权限
         boolean flag = userRoleService.setUserRole(glAccount.getId(), "ROLE_VIEWER");
@@ -62,8 +73,11 @@ public class GlAccountServiceImpl extends ServiceImpl<GlAccountMapper, GlAccount
                 .eq("account", signInReq.getAccount());
         GlAccount glAccount = baseMapper.selectOne(queryWrapper);
 
+        if (glAccount == null) {
+            throw new BadCredentialsException("用户名或密码错误!");
+        }
         // 验证验证码
-        if (!isCaptchaValid(signInReq.getCaptcha(),signInReq.getClientId())) {
+        if (!isCaptchaValid(signInReq.getCaptcha(), signInReq.getClientId())) {
             throw new BadCredentialsException("验证码错误!");
         }
         // 销毁验证码
@@ -83,7 +97,7 @@ public class GlAccountServiceImpl extends ServiceImpl<GlAccountMapper, GlAccount
     public boolean isCaptchaValid(String captcha, String clientId) {
         Jedis resource = JedisPoolSingleton.getInstance().getResource();
         String rawCaptcha = resource.get(clientId);
-        if (rawCaptcha == null){
+        if (rawCaptcha == null) {
             throw new BadCredentialsException("验证码已过期!");
         }
         return rawCaptcha.equalsIgnoreCase(captcha);
@@ -117,34 +131,34 @@ public class GlAccountServiceImpl extends ServiceImpl<GlAccountMapper, GlAccount
         return glAccount;
     }
 
-@Override
-public boolean updateAvatar(Long userId, MultipartFile avatar) throws IOException {
-    if (avatar == null) {
-        throw new IllegalArgumentException("Avatar file cannot be null");
+    @Override
+    public boolean updateAvatar(Long userId, MultipartFile avatar) throws IOException {
+        if (avatar == null) {
+            throw new IllegalArgumentException("Avatar file cannot be null");
+        }
+
+        String newFileName = FileUtil.upload(avatar, fileUploadPath.getAvatarPath());
+        GlAccount glAccount = new GlAccount();
+        glAccount.setId(userId);
+        glAccount.setAvatar(newFileName);
+        boolean isUpdated = baseMapper.updateById(glAccount) > 0;
+        if (isUpdated) {
+            UserProvider.setUser(glAccount);
+        }
+        return isUpdated;
     }
 
-    String newFileName = FileUtil.upload(avatar, fileUploadPath.getAvatarPath());
-    GlAccount glAccount = new GlAccount();
-    glAccount.setId(userId);
-    glAccount.setAvatar(newFileName);
-    boolean isUpdated = baseMapper.updateById(glAccount) > 0;
-    if (isUpdated) {
-        UserProvider.setUser(glAccount);
+
+    @Override
+    public GlAccount getUserInfo() {
+        GlAccount user = UserProvider.getUser();
+        if (user == null) {
+            throw new IllegalStateException("User information not found");
+        }
+
+        user.setAvatar(String.format("%s/%s/%s", fileUrl.getUrl(), FileType.Avatar.getType(), user.getAvatar()));
+        return user;
     }
-    return isUpdated;
-}
-
-
-@Override
-public GlAccount getUserInfo() {
-    GlAccount user = UserProvider.getUser();
-    if (user == null) {
-        throw new IllegalStateException("User information not found");
-    }
-
-    user.setAvatar(String.format("%s/%s/%s", fileUrl.getUrl(), FileType.Avatar.getType(), user.getAvatar()));
-    return user;
-}
 
 }
 

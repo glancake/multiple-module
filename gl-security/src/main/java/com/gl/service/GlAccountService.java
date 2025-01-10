@@ -4,6 +4,7 @@ import com.gl.domain.GlAccount;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gl.dto.GlAccountRegisterReq;
 import com.gl.dto.GlAccountSignInReq;
+import com.gl.exception.AccountAlreadyExistsException;
 import com.gl.exception.BizException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,7 +23,7 @@ public interface GlAccountService extends IService<GlAccount> {
  * 1.注册
  * 2.登录
  */
-    void register(GlAccountRegisterReq registerReq);
+    void register(GlAccountRegisterReq registerReq) throws BizException, AccountAlreadyExistsException;
     void login(GlAccountSignInReq signInReq);
 
 

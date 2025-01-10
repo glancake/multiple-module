@@ -3,6 +3,8 @@ package com.gl.controller;
 import com.gl.api.CommonResult;
 import com.gl.dto.GlAccountRegisterReq;
 import com.gl.dto.GlAccountSignInReq;
+import com.gl.exception.AccountAlreadyExistsException;
+import com.gl.exception.BizException;
 import com.gl.filter.CustomAuthenticationToken;
 import com.gl.service.GlAccountService;
 import com.gl.service.JwtService;
@@ -46,7 +48,7 @@ public class AuthController {
     }
 
     @PostMapping("register")
-    public CommonResult<String> handleRegister(@RequestBody GlAccountRegisterReq registerReq) {
+    public CommonResult<String> handleRegister(@RequestBody GlAccountRegisterReq registerReq) throws BizException, AccountAlreadyExistsException {
         registerReq.setPassword(passwordEncoder.encode(registerReq.getPassword()));
         glAccountService.register(registerReq);
         return CommonResult.success("register successfully");
